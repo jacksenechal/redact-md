@@ -8,23 +8,23 @@ and a local spaCy model. Nothing crosses the network. Fenced code blocks and
 inline `` `code` `` are preserved unchanged, so it is safe to run on notes,
 transcripts, and AI artifacts that mix prose with config and snippets.
 
-```
+````markdown
 **Alice Nguyen:** My SSN is 432-18-6792. Reach me at a.nguyen@firm.com.
 
 ```yaml
 api_key: "sk-abc123"   # code blocks are skipped
 ```
-```
+````
 
 becomes
 
-```
+````markdown
 **<PERSON>:** My SSN is <SSN>. Reach me at <EMAIL>.
 
 ```yaml
 api_key: "sk-abc123"   # untouched
 ```
-```
+````
 
 ## Why this exists
 
