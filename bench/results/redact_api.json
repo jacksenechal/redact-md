@@ -1,0 +1,187 @@
+{
+  "redact-api": {
+    "recall": 0.6505376344086021,
+    "precision": 0.28205128205128205,
+    "f1": 0.3934959349593496,
+    "fp_safe": 11,
+    "avg_ms": 338.5845062788576,
+    "load_ms": 379.66212583705783,
+    "misses": [
+      "[t01_kickoff] [PHONE_NUMBER] '+41 44 555 01 23'",
+      "[t01_kickoff] [IBAN_CODE] 'IBAN CH93 0076 2011 6238 5295 7'",
+      "[t01_kickoff] [TAX_ID] 'CHE-123.456.789'",
+      "[t02_eng_sync] [PERSON] 'Jordan Park'",
+      "[t02_eng_sync] [PERSON] 'Mia Tanaka'",
+      "[t02_eng_sync] [PHONE_NUMBER] 'five five five\\ntwo two four seven eight nine zero'",
+      "[t02_eng_sync] [PHONE_NUMBER] '555-0134'",
+      "[t02_eng_sync] [LOCATION] '308 Negra Arroyo Lane, Albuquerque, NM 87104'",
+      "[t02_eng_sync] [PASSWORD] 'hunter2'",
+      "[t03_hr_onboarding] [DATE_OF_BIRTH] 'March fourteenth, nineteen ninety-one'",
+      "[t03_hr_onboarding] [LOCATION] '77 Orchard Street, Apartment 4B, Brooklyn, New York, 11211'",
+      "[t03_hr_onboarding] [BANK_ROUTING] 'zero two six zero zero nine five nine three'",
+      "[t03_hr_onboarding] [BANK_ACCOUNT] 'four four seven eight eight two one zero three'",
+      "[t04_board_finance] [PHONE_NUMBER] '+81 3 5555 7890'",
+      "[t04_board_finance] [BANK_ROUTING] '021000021'",
+      "[t04_board_finance] [BANK_ACCOUNT] '1234567890'",
+      "[t04_board_finance] [IBAN_CODE] 'DE89 3704 0044 0532 0130 00'",
+      "[t04_board_finance] [TAX_ID] 'DE 123456789'",
+      "[t04_board_finance] [PHONE_NUMBER] '+1 (212) 555-0193'",
+      "[t05_legal_hold] [PHONE_NUMBER] '+33 6 12 34 56 78'",
+      "[t05_legal_hold] [PHONE_NUMBER] '(617) 555-2298'",
+      "[t05_legal_hold] [LOCATION] '12 rue de la Paix, 75002 Paris, France'",
+      "[t05_legal_hold] [IBAN_CODE] 'FR76 3000 6000 0112 3456 7890 189'",
+      "[t05_legal_hold] [LICENSE_NUMBER] 'BBO#682341'",
+      "[t06_security_incident] [US_SSN] '567-89-0123'",
+      "[t06_security_incident] [PHONE_NUMBER] '+49 89 555 0276'",
+      "[t06_security_incident] [AWS_KEY] 'AKIAIOSFODNN7EXAMPLE'",
+      "[t07_sales_call] [PHONE_NUMBER] '+1 (206) 555 1337'",
+      "[t07_sales_call] [BANK_ROUTING] '121000248'",
+      "[t07_sales_call] [BANK_ACCOUNT] '7654321098'",
+      "[t07_sales_call] [MEDICAL_RECORD] 'MRN-449012'",
+      "[t07_sales_call] [DATE_OF_BIRTH] '1978-11-22'",
+      "[t07_sales_call] [INSURANCE_ID] 'UHC-884-22-9971'",
+      "[t08_allhands] [LOCATION] '999 Market Street, Suite 800, San Francisco, CA 94103'",
+      "[t08_allhands] [LOCATION] '52 Juniper Lane, Austin, TX 78704'",
+      "[t08_allhands] [PHONE_NUMBER] '+1 512 555 0148'",
+      "[t09_contract_negotiation] [PERSON] 'Elaine Park'",
+      "[t09_contract_negotiation] [PERSON] 'Fatima Al-Rashid'",
+      "[t09_contract_negotiation] [PHONE_NUMBER] '+82 2 555 3344'",
+      "[t09_contract_negotiation] [PHONE_NUMBER] '(650) 555-0001'",
+      "[t09_contract_negotiation] [IBAN_CODE] 'NL91 ABNA 0417 1643 00'",
+      "[t09_contract_negotiation] [LOCATION] 'V\u00e1clavsk\u00e9 n\u00e1m\u011bst\u00ed 1, 110 00 Praha 1, Czech Republic'",
+      "[t11_product_roadmap] [PERSON] 'Noah Carpenter'",
+      "[t11_product_roadmap] [PERSON] 'Carmen Mart\u00ednez'",
+      "[t11_product_roadmap] [LOCATION] 'Calle de Serrano 41, 28001 Madrid, Spain'",
+      "[t11_product_roadmap] [TAX_ID] 'ESB-12345678'",
+      "[t12_support_escalation] [PHONE_NUMBER] '+33 1 42 55 07 08'",
+      "[t12_support_escalation] [PHONE_NUMBER] '+44 7700 900 123'",
+      "[t12_support_escalation] [CREDIT_CARD] '3714 496353 98431'",
+      "[t12_support_escalation] [BANK_ACCOUNT] '58110244'",
+      "[t12_support_escalation] [SORT_CODE] '20-00-00'",
+      "[t13_clinical_trial] [MEDICAL_RECORD] '884-22-019'",
+      "[t14_jv_negotiation] [EMAIL_ADDRESS] 'm.santos@sulcorp.com.br'",
+      "[t14_jv_negotiation] [PHONE_NUMBER] '+46 8 555 2277'",
+      "[t14_jv_negotiation] [PHONE_NUMBER] '+55 11 5555 8899'",
+      "[t14_jv_negotiation] [PHONE_NUMBER] '+31 20 555 0088'",
+      "[t14_jv_negotiation] [PHONE_NUMBER] '+46 70 555 0049'",
+      "[t14_jv_negotiation] [PHONE_NUMBER] '+55 11 9 8888 7777'",
+      "[t14_jv_negotiation] [LOCATION] 'Keizersgracht 123, 1015 CJ Amsterdam'",
+      "[t14_jv_negotiation] [IBAN_CODE] 'SE45 5000 0000 0583 9825 7466'",
+      "[t14_jv_negotiation] [TAX_ID] '12.345.678/0001-95'",
+      "[t14_jv_negotiation] [PASSPORT_NUMBER] 'BR9988776'",
+      "[t15_security_audit] [PERSON] 'Yolanda Brooks'",
+      "[t15_security_audit] [PERSON] 'Patrick Lam'",
+      "[t15_security_audit] [LOCATION] '1802 Oak Street, Palo Alto, CA 94301'"
+    ],
+    "safe_hits": [
+      "[t02_eng_sync] '```yaml\\noidc:\\n  client_id: \"app-prod-1234\"\\n  issuer: \"https:'",
+      "[t06_security_incident] '10.0.0.1'",
+      "[t06_security_incident] '10.0.0.1'",
+      "[t08_allhands] 'openssl s_client -connect vpn.company.com:443 -psk \"PLACEHOL'",
+      "[t09_contract_negotiation] '\"api_endpoint\": \"https://api.vendorcorp.com/v2\"'",
+      "[t09_contract_negotiation] '\"api_key\": \"API_KEY_PLACEHOLDER\"'",
+      "[t11_product_roadmap] '`https://docs.internal/billing/v3`'",
+      "[t13_clinical_trial] 'd41d8cd98f00b204e9800998ecf8427e'",
+      "[t15_security_audit] '\"email\": \"testuser@example.com\"'",
+      "[t15_security_audit] '\"ssn\": \"000-00-0000\"'",
+      "[t15_security_audit] '\"dob\": \"1990-01-01\"'"
+    ],
+    "per_label": {
+      "PERSON": {
+        "tp": 42,
+        "fn": 8,
+        "total": 50
+      },
+      "PHONE_NUMBER": {
+        "tp": 19,
+        "fn": 19,
+        "total": 38
+      },
+      "EMAIL_ADDRESS": {
+        "tp": 43,
+        "fn": 1,
+        "total": 44
+      },
+      "LOCATION": {
+        "tp": 4,
+        "fn": 9,
+        "total": 13
+      },
+      "IBAN_CODE": {
+        "tp": 0,
+        "fn": 5,
+        "total": 5
+      },
+      "TAX_ID": {
+        "tp": 0,
+        "fn": 4,
+        "total": 4
+      },
+      "PASSWORD": {
+        "tp": 0,
+        "fn": 1,
+        "total": 1
+      },
+      "DATE_OF_BIRTH": {
+        "tp": 5,
+        "fn": 2,
+        "total": 7
+      },
+      "US_SSN": {
+        "tp": 3,
+        "fn": 1,
+        "total": 4
+      },
+      "BANK_ROUTING": {
+        "tp": 0,
+        "fn": 3,
+        "total": 3
+      },
+      "BANK_ACCOUNT": {
+        "tp": 0,
+        "fn": 4,
+        "total": 4
+      },
+      "PASSPORT_NUMBER": {
+        "tp": 1,
+        "fn": 1,
+        "total": 2
+      },
+      "CREDIT_CARD": {
+        "tp": 3,
+        "fn": 1,
+        "total": 4
+      },
+      "LICENSE_NUMBER": {
+        "tp": 0,
+        "fn": 1,
+        "total": 1
+      },
+      "IP_ADDRESS": {
+        "tp": 1,
+        "fn": 0,
+        "total": 1
+      },
+      "AWS_KEY": {
+        "tp": 0,
+        "fn": 1,
+        "total": 1
+      },
+      "MEDICAL_RECORD": {
+        "tp": 0,
+        "fn": 2,
+        "total": 2
+      },
+      "INSURANCE_ID": {
+        "tp": 0,
+        "fn": 1,
+        "total": 1
+      },
+      "SORT_CODE": {
+        "tp": 0,
+        "fn": 1,
+        "total": 1
+      }
+    }
+  }
+}

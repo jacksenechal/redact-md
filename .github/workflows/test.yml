@@ -1,0 +1,38 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install (no model download)
+        # Install only the package + dev deps, not the en_core_web_lg wheel,
+        # so the unit tests run fast without a 400 MB download.
+        run: |
+          pip install spacy presidio-analyzer presidio-anonymizer pytest
+          pip install -e . --no-deps
+      - name: Unit tests (no model required)
+        run: pytest tests/ -v -m "not integration"
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package + model
+        run: |
+          pip install -e .
+          python -m spacy download en_core_web_lg
+          pip install pytest
+      - name: Integration tests
+        run: pytest tests/ -v -m integration
