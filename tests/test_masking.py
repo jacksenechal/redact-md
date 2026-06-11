@@ -103,3 +103,12 @@ def test_placeholder_uniqueness():
     masked, saved = _mask_code(text)
     placeholders = [ph for ph, _ in saved]
     assert len(placeholders) == len(set(placeholders))
+
+
+def test_empty_allowlist_redacts_nothing():
+    # An explicit empty allowlist short-circuits before the engine loads, so
+    # this runs without the spaCy model. Guards against Presidio's quirk of
+    # treating entities=[] as "detect everything".
+    from redact_md import redact
+    text = "Bob Jones at bob@example.com."
+    assert redact(text, entities=[]) == text

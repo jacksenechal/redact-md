@@ -34,6 +34,9 @@ _INLINE_CODE = re.compile(r"`[^`\n]+`")
 _PFX = "\x00CODEBLOCK_"
 _SFX = "\x00"
 
+# Pretty replacement labels for the most common entity types. Any other
+# entity Presidio detects is still redacted -- the anonymizer falls back to a
+# generic <ENTITY_TYPE> tag for anything not listed here.
 _OPERATORS = {
     "PERSON":        OperatorConfig("replace", {"new_value": "<PERSON>"}),
     "EMAIL_ADDRESS": OperatorConfig("replace", {"new_value": "<EMAIL>"}),
@@ -48,7 +51,16 @@ _OPERATORS = {
     "URL":           OperatorConfig("replace", {"new_value": "<URL>"}),
 }
 
-DEFAULT_ENTITIES = tuple(_OPERATORS.keys())
+# Presidio's default predefined recognizers for English. By default redact-md
+# detects ALL of these (maximum recall); this tuple drives --list-entities and
+# CLI validation. Detection itself uses whatever the installed Presidio version
+# supports, so a newer Presidio that adds recognizers is still a superset.
+SUPPORTED_ENTITIES = (
+    "PERSON", "EMAIL_ADDRESS", "PHONE_NUMBER", "US_SSN", "US_ITIN",
+    "US_PASSPORT", "US_DRIVER_LICENSE", "US_BANK_NUMBER", "CREDIT_CARD",
+    "IBAN_CODE", "CRYPTO", "IP_ADDRESS", "LOCATION", "DATE_TIME", "NRP",
+    "MEDICAL_LICENSE", "UK_NHS", "URL",
+)
 
 _analyzer: AnalyzerEngine | None = None
 _anonymizer: AnonymizerEngine | None = None
@@ -90,23 +102,39 @@ def _unmask_code(text: str, saved: List[Tuple[str, str]]) -> str:
     return text
 
 
-def redact(text: str, entities: "list[str] | None" = None) -> str:
-    active = list(entities) if entities is not None else list(DEFAULT_ENTITIES)
-    if not active:
-        # Empty allowlist means "redact nothing". Presidio treats an empty
-        # entities list as "detect everything", so short-circuit instead.
+def redact(text: str, entities=None, keep=None) -> str:
+    """Redact PII from ``text``, preserving code blocks.
+
+    entities: allowlist of entity types to detect. ``None`` (the default)
+              means detect everything Presidio supports -- maximum recall.
+    keep:     iterable of entity types to leave untouched, applied after
+              detection. Mutually exclusive with ``entities`` at the CLI.
+    """
+    if entities is not None and not entities:
+        # An explicit empty allowlist means "redact nothing". (Presidio treats
+        # an empty entities list as "detect everything", so short-circuit.)
         return text
     masked, saved = _mask_code(text)
     analyzer, anonymizer = _engines()
-    hits = analyzer.analyze(text=masked, language="en", entities=active)
+    hits = analyzer.analyze(
+        text=masked,
+        language="en",
+        entities=list(entities) if entities is not None else None,
+    )
+    if keep:
+        keep = set(keep)
+        hits = [h for h in hits if h.entity_type not in keep]
     if not hits:
         return text
     result = anonymizer.anonymize(text=masked, analyzer_results=hits, operators=_OPERATORS)
     return _unmask_code(result.text, saved)
 
 
-def _redact_file(src: Path, dst: Path, entities=None) -> None:
-    dst.write_text(redact(src.read_text(encoding="utf-8"), entities=entities), encoding="utf-8")
+def _redact_file(src: Path, dst: Path, entities=None, keep=None) -> None:
+    dst.write_text(
+        redact(src.read_text(encoding="utf-8"), entities=entities, keep=keep),
+        encoding="utf-8",
+    )
     print(f"{src} -> {dst}", file=sys.stderr)
 
 
@@ -126,7 +154,7 @@ def main() -> None:
     p.add_argument("--out-dir", metavar="DIR",
                    help="Output directory for --dir mode (required).")
     p.add_argument("--keep", metavar="ENTITIES",
-                   help="Comma-separated entity types to NOT redact (redact everything else in the default set).")
+                   help="Comma-separated entity types to NOT redact (everything else is still redacted).")
     p.add_argument("--entities", metavar="ENTITIES",
                    help="Comma-separated allowlist: redact ONLY these types.")
     p.add_argument("--list-entities", action="store_true",
@@ -134,7 +162,7 @@ def main() -> None:
     args = p.parse_args()
 
     if args.list_entities:
-        for name in DEFAULT_ENTITIES:
+        for name in sorted(SUPPORTED_ENTITIES):
             print(name)
         return
 
@@ -145,17 +173,17 @@ def main() -> None:
         result = []
         for name in raw.split(","):
             name = name.strip().upper()
-            if name not in DEFAULT_ENTITIES:
+            if not name:
+                continue
+            if name not in SUPPORTED_ENTITIES:
                 p.error(f"unknown entity type: {name} (see --list-entities)")
             result.append(name)
         return result
 
-    active: list[str] | None = None
-    if args.entities:
-        active = _parse_entities(args.entities)
-    elif args.keep:
-        keep_set = set(_parse_entities(args.keep))
-        active = [e for e in DEFAULT_ENTITIES if e not in keep_set]
+    # entities = allowlist (detect only these); keep = drop these after
+    # detection. Default (neither) redacts every type Presidio detects.
+    entities: list[str] | None = _parse_entities(args.entities) if args.entities else None
+    keep: set[str] | None = set(_parse_entities(args.keep)) if args.keep else None
 
     if args.dir:
         if not args.out_dir:
@@ -166,7 +194,7 @@ def main() -> None:
         for src in sorted(in_root.rglob("*.md")):
             dst = out_root / src.relative_to(in_root)
             dst.parent.mkdir(parents=True, exist_ok=True)
-            _redact_file(src, dst, entities=active)
+            _redact_file(src, dst, entities=entities, keep=keep)
         return
 
     if not args.input:
@@ -177,7 +205,7 @@ def main() -> None:
     else:
         text = Path(args.input).read_text(encoding="utf-8")
 
-    redacted = redact(text, entities=active)
+    redacted = redact(text, entities=entities, keep=keep)
 
     if args.in_place and args.input != "-":
         src = Path(args.input)

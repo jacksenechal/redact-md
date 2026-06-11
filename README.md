@@ -99,9 +99,15 @@ redact-md --dir ~/meetings/2026-06/ --out-dir ~/meetings/2026-06-redacted/
 
 ### Choosing what to redact
 
-By default `redact-md` redacts a fixed set of entity types, and *only* those
-types (detection is restricted to the set, so nothing else is touched or
-mislabeled). You can narrow or adjust it:
+By default `redact-md` redacts **everything Presidio can detect** (18 entity
+types: names, emails, phones, SSNs, ITINs, passports, driver's licenses, bank
+numbers, credit cards, IBANs, crypto wallets, IPs, locations, dates, NRP,
+medical licenses, UK NHS numbers, URLs). Over-redaction is the safe direction:
+a missed identifier leaks, an extra one does not. The common types get readable
+labels (`<PERSON>`, `<EMAIL>`, ...); the rest fall back to a generic
+`<ENTITY_TYPE>` tag.
+
+You can narrow that:
 
 ```bash
 # List the supported entity types
@@ -114,9 +120,8 @@ redact-md --keep DATE_TIME notes.md
 redact-md --entities PERSON,EMAIL_ADDRESS notes.md
 ```
 
-Default set: `PERSON`, `EMAIL_ADDRESS`, `PHONE_NUMBER`, `US_SSN`,
-`CREDIT_CARD`, `IBAN_CODE`, `LOCATION`, `IP_ADDRESS`, `DATE_TIME`,
-`MEDICAL_LICENSE`, `URL`. `--keep` and `--entities` are mutually exclusive.
+`--keep` drops the listed types after detection; `--entities` is an allowlist
+that detects only the listed types. The two are mutually exclusive.
 
 ### Use as an agent hook
 

@@ -35,11 +35,23 @@ def test_redacts_pii_but_preserves_code():
 
 
 @needs_model
+def test_default_redacts_beyond_the_labeled_set():
+    # Regression guard: the default must redact every type Presidio detects,
+    # not just the 11 with custom labels. A leaked license is the failure
+    # this tool exists to prevent.
+    from redact_md import redact
+    src = ("Driver license D1234567, wallet "
+           "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa.")
+    out = redact(src)
+    assert "D1234567" not in out                          # US_DRIVER_LICENSE
+    assert "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa" not in out # CRYPTO
+
+
+@needs_model
 def test_keep_disables_entity_type():
-    from redact_md import redact, DEFAULT_ENTITIES
+    from redact_md import redact
     src = "We met on March 3, 2026 to talk with Bob Jones."
-    active = [e for e in DEFAULT_ENTITIES if e != "DATE_TIME"]
-    out = redact(src, entities=active)
+    out = redact(src, keep={"DATE_TIME"})
     assert "March 3, 2026" in out             # DATE_TIME kept
     assert "Bob Jones" not in out             # PERSON still redacted
 
