@@ -3,8 +3,8 @@
     {
       "label": "EMAIL_ADDRESS",
       "text": "mark@atlas.example.com",
-      "start": 589,
-      "end": 611
+      "start": 597,
+      "end": 619
     },
     {
       "label": "DATE_TIME",
@@ -14,159 +14,159 @@
     },
     {
       "label": "LOCATION",
-      "text": "Geneva",
-      "start": 131,
-      "end": 137
+      "text": "Savannah",
+      "start": 135,
+      "end": 143
     },
     {
       "label": "PERSON",
       "text": "Jack",
-      "start": 191,
-      "end": 195
+      "start": 197,
+      "end": 201
     },
     {
       "label": "PERSON",
       "text": "Jack Lindqvist",
-      "start": 243,
-      "end": 257
+      "start": 249,
+      "end": 263
     },
     {
       "label": "PERSON",
       "text": "Jack",
-      "start": 278,
-      "end": 282
+      "start": 284,
+      "end": 288
     },
     {
       "label": "PERSON",
       "text": "Atlas",
-      "start": 350,
-      "end": 355
+      "start": 356,
+      "end": 361
     },
     {
       "label": "DATE_TIME",
       "text": "two weeks",
-      "start": 375,
-      "end": 384
+      "start": 381,
+      "end": 390
     },
     {
       "label": "PERSON",
       "text": "Rose Tanaka",
-      "start": 486,
-      "end": 497
+      "start": 494,
+      "end": 505
     },
     {
       "label": "DATE_TIME",
       "text": "last quarter",
-      "start": 528,
-      "end": 540
+      "start": 536,
+      "end": 548
     },
     {
       "label": "PERSON",
       "text": "Mark Delacroix",
-      "start": 637,
-      "end": 651
+      "start": 645,
+      "end": 659
     },
     {
       "label": "PERSON",
       "text": "Bill",
-      "start": 708,
-      "end": 712
+      "start": 716,
+      "end": 720
     },
     {
       "label": "PERSON",
       "text": "Bill Nakamura",
-      "start": 754,
-      "end": 767
+      "start": 762,
+      "end": 775
     },
     {
       "label": "DATE_TIME",
       "text": "May",
-      "start": 809,
-      "end": 812
+      "start": 817,
+      "end": 820
     },
     {
       "label": "PERSON",
       "text": "Bill Nakamura",
-      "start": 814,
-      "end": 827
+      "start": 822,
+      "end": 835
     },
     {
       "label": "LOCATION",
       "text": "Paris",
-      "start": 870,
-      "end": 875
+      "start": 878,
+      "end": 883
     },
     {
       "label": "LOCATION",
       "text": "Paris",
-      "start": 932,
-      "end": 937
+      "start": 940,
+      "end": 945
     },
     {
       "label": "LOCATION",
-      "text": "Geneva",
-      "start": 975,
-      "end": 981
+      "text": "Savannah",
+      "start": 983,
+      "end": 991
     },
     {
       "label": "DATE_TIME",
       "text": "next month",
-      "start": 989,
-      "end": 999
+      "start": 999,
+      "end": 1009
     },
     {
       "label": "LOCATION",
-      "text": "Geneva",
-      "start": 1040,
-      "end": 1046
+      "text": "Savannah",
+      "start": 1050,
+      "end": 1058
     },
     {
       "label": "LOCATION",
       "text": "Florence",
-      "start": 1100,
-      "end": 1108
+      "start": 1116,
+      "end": 1124
     },
     {
       "label": "PERSON",
       "text": "Florence Kim:*",
-      "start": 1131,
-      "end": 1145
+      "start": 1147,
+      "end": 1161
     },
     {
       "label": "PERSON",
       "text": "Florence Kim",
-      "start": 1152,
-      "end": 1164
+      "start": 1168,
+      "end": 1180
     },
     {
       "label": "LOCATION",
       "text": "Florence",
-      "start": 1186,
-      "end": 1194
+      "start": 1202,
+      "end": 1210
     },
     {
       "label": "LOCATION",
       "text": "Austin",
-      "start": 1319,
-      "end": 1325
+      "start": 1335,
+      "end": 1341
     },
     {
       "label": "DATE_TIME",
       "text": "Thursday",
-      "start": 1366,
-      "end": 1374
+      "start": 1382,
+      "end": 1390
     },
     {
       "label": "URL",
       "text": "atlas.example.com",
-      "start": 594,
-      "end": 611
+      "start": 602,
+      "end": 619
     },
     {
       "label": "US_DRIVER_LICENSE",
       "text": "Q3",
-      "start": 225,
-      "end": 227
+      "start": 231,
+      "end": 233
     }
   ],
   "redact-cli": [
@@ -179,8 +179,8 @@
     {
       "label": "EMAIL_ADDRESS",
       "text": "@atlas.example.com rig",
-      "start": 593,
-      "end": 615
+      "start": 601,
+      "end": 623
     }
   ],
   "opf": [
@@ -192,129 +192,135 @@
     },
     {
       "label": "private_person",
-      "text": "Geneva Okafor",
+      "text": "Savannah Okafor",
       "start": 79,
-      "end": 92
+      "end": 94
     },
     {
       "label": "private_person",
-      "text": "Geneva Okafor",
-      "start": 101,
-      "end": 114
+      "text": "Savannah Okafor",
+      "start": 103,
+      "end": 118
+    },
+    {
+      "label": "private_person",
+      "text": "Savannah",
+      "start": 135,
+      "end": 143
     },
     {
       "label": "private_person",
       "text": "Jack",
-      "start": 191,
-      "end": 195
+      "start": 197,
+      "end": 201
     },
     {
       "label": "private_person",
       "text": "Jack Lindqvist",
-      "start": 243,
-      "end": 257
+      "start": 249,
+      "end": 263
     },
     {
       "label": "private_person",
       "text": "Jack",
-      "start": 278,
-      "end": 282
+      "start": 284,
+      "end": 288
     },
     {
       "label": "private_person",
-      "text": "Geneva Okafor",
-      "start": 412,
-      "end": 425
+      "text": "Savannah Okafor",
+      "start": 418,
+      "end": 433
     },
     {
       "label": "private_person",
       "text": "Rose",
-      "start": 436,
-      "end": 440
+      "start": 444,
+      "end": 448
     },
     {
       "label": "private_person",
       "text": "Rose Tanaka",
-      "start": 486,
-      "end": 497
+      "start": 494,
+      "end": 505
     },
     {
       "label": "private_email",
       "text": "mark@atlas.example.com",
-      "start": 589,
-      "end": 611
+      "start": 597,
+      "end": 619
     },
     {
       "label": "private_person",
       "text": "Mark Delacroix",
-      "start": 637,
-      "end": 651
+      "start": 645,
+      "end": 659
     },
     {
       "label": "private_person",
       "text": "Rose",
-      "start": 662,
-      "end": 666
+      "start": 670,
+      "end": 674
     },
     {
       "label": "private_person",
       "text": "Bill",
-      "start": 708,
-      "end": 712
+      "start": 716,
+      "end": 720
     },
     {
       "label": "private_person",
       "text": "Bill Nakamura",
-      "start": 754,
-      "end": 767
+      "start": 762,
+      "end": 775
     },
     {
       "label": "private_person",
       "text": "Bill Nakamura",
-      "start": 814,
-      "end": 827
+      "start": 822,
+      "end": 835
     },
     {
       "label": "private_person",
       "text": "Paris Adeyemi",
-      "start": 908,
-      "end": 921
+      "start": 916,
+      "end": 929
     },
     {
       "label": "private_person",
-      "text": "Geneva Okafor",
-      "start": 1058,
-      "end": 1071
-    },
-    {
-      "label": "private_person",
-      "text": "Florence Kim",
-      "start": 1131,
-      "end": 1143
+      "text": "Savannah Okafor",
+      "start": 1070,
+      "end": 1085
     },
     {
       "label": "private_person",
       "text": "Florence Kim",
-      "start": 1152,
-      "end": 1164
+      "start": 1147,
+      "end": 1159
+    },
+    {
+      "label": "private_person",
+      "text": "Florence Kim",
+      "start": 1168,
+      "end": 1180
     },
     {
       "label": "private_person",
       "text": "Sydney Mbeki",
-      "start": 1251,
-      "end": 1263
+      "start": 1267,
+      "end": 1279
     },
     {
       "label": "private_person",
       "text": "Will Castellano",
-      "start": 1379,
-      "end": 1394
+      "start": 1395,
+      "end": 1410
     },
     {
       "label": "private_person",
-      "text": "Geneva Okafor",
-      "start": 1459,
-      "end": 1472
+      "text": "Savannah Okafor",
+      "start": 1475,
+      "end": 1490
     }
   ]
 }
