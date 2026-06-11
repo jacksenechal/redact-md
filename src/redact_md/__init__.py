@@ -11,6 +11,7 @@ Usage:
   cat notes.md | redact-md -            # reads from stdin
   redact-md --dir ~/meetings/ --out-dir ~/meetings-redacted/
   redact-md --keep DATE_TIME notes.md   # redact everything except dates
+  redact-md --names "Savannah Okafor,Will" notes.md   # always redact a roster
 """
 from __future__ import annotations
 
@@ -20,7 +21,7 @@ import sys
 from pathlib import Path
 from typing import List, Tuple
 
-from presidio_analyzer import AnalyzerEngine
+from presidio_analyzer import AnalyzerEngine, PatternRecognizer
 from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import OperatorConfig
 
@@ -102,24 +103,39 @@ def _unmask_code(text: str, saved: List[Tuple[str, str]]) -> str:
     return text
 
 
-def redact(text: str, entities=None, keep=None) -> str:
+def redact(text: str, entities=None, keep=None, names=None) -> str:
     """Redact PII from ``text``, preserving code blocks.
 
     entities: allowlist of entity types to detect. ``None`` (the default)
               means detect everything Presidio supports -- maximum recall.
     keep:     iterable of entity types to leave untouched, applied after
               detection. Mutually exclusive with ``entities`` at the CLI.
+    names:    iterable of known person names to always redact (as PERSON),
+              matched case-insensitively. Use this for a meeting roster: it
+              guarantees those names are caught even when NER misses them
+              (bare first names, names that are also places or common words).
     """
-    if entities is not None and not entities:
+    if entities is not None and not entities and not names:
         # An explicit empty allowlist means "redact nothing". (Presidio treats
         # an empty entities list as "detect everything", so short-circuit.)
         return text
     masked, saved = _mask_code(text)
     analyzer, anonymizer = _engines()
+
+    ad_hoc = None
+    active = entities
+    if names:
+        ad_hoc = [PatternRecognizer(supported_entity="PERSON", deny_list=list(names))]
+        # A deny-list only helps if PERSON is actually being detected, so make
+        # sure it survives an explicit --entities allowlist.
+        if active is not None and "PERSON" not in active:
+            active = list(active) + ["PERSON"]
+
     hits = analyzer.analyze(
         text=masked,
         language="en",
-        entities=list(entities) if entities is not None else None,
+        entities=list(active) if active is not None else None,
+        ad_hoc_recognizers=ad_hoc,
     )
     if keep:
         keep = set(keep)
@@ -130,9 +146,9 @@ def redact(text: str, entities=None, keep=None) -> str:
     return _unmask_code(result.text, saved)
 
 
-def _redact_file(src: Path, dst: Path, entities=None, keep=None) -> None:
+def _redact_file(src: Path, dst: Path, entities=None, keep=None, names=None) -> None:
     dst.write_text(
-        redact(src.read_text(encoding="utf-8"), entities=entities, keep=keep),
+        redact(src.read_text(encoding="utf-8"), entities=entities, keep=keep, names=names),
         encoding="utf-8",
     )
     print(f"{src} -> {dst}", file=sys.stderr)
@@ -159,6 +175,14 @@ def main() -> None:
                    help="Comma-separated allowlist: redact ONLY these types.")
     p.add_argument("--list-entities", action="store_true",
                    help="Print the supported entity types and exit.")
+    p.add_argument("--names", metavar="NAMES",
+                   help="Comma-separated known person names to always redact, e.g. a "
+                        "meeting roster. Matched case-insensitively; guarantees names "
+                        "the model would otherwise miss (bare first names, names that "
+                        "are also places or common words).")
+    p.add_argument("--names-file", metavar="FILE",
+                   help="File with one name per line to always redact (merged with "
+                        "--names; blank lines and lines starting with # are ignored).")
     args = p.parse_args()
 
     if args.list_entities:
@@ -185,6 +209,16 @@ def main() -> None:
     entities: list[str] | None = _parse_entities(args.entities) if args.entities else None
     keep: set[str] | None = set(_parse_entities(args.keep)) if args.keep else None
 
+    # names = a deny-list of known people to always redact as PERSON.
+    names: list[str] = []
+    if args.names:
+        names += [n.strip() for n in args.names.split(",") if n.strip()]
+    if args.names_file:
+        names += [ln.strip() for ln in
+                  Path(args.names_file).read_text(encoding="utf-8").splitlines()
+                  if ln.strip() and not ln.lstrip().startswith("#")]
+    names = names or None
+
     if args.dir:
         if not args.out_dir:
             p.error("--out-dir is required with --dir")
@@ -194,7 +228,7 @@ def main() -> None:
         for src in sorted(in_root.rglob("*.md")):
             dst = out_root / src.relative_to(in_root)
             dst.parent.mkdir(parents=True, exist_ok=True)
-            _redact_file(src, dst, entities=entities, keep=keep)
+            _redact_file(src, dst, entities=entities, keep=keep, names=names)
         return
 
     if not args.input:
@@ -205,7 +239,7 @@ def main() -> None:
     else:
         text = Path(args.input).read_text(encoding="utf-8")
 
-    redacted = redact(text, entities=entities, keep=keep)
+    redacted = redact(text, entities=entities, keep=keep, names=names)
 
     if args.in_place and args.input != "-":
         src = Path(args.input)

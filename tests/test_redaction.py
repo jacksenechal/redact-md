@@ -63,3 +63,24 @@ def test_entities_allowlist_limits_scope():
     out = redact(src, entities=["EMAIL_ADDRESS"])
     assert "bob@example.com" not in out
     assert "Bob Jones" in out                 # PERSON not in allowlist, left alone
+
+
+@needs_model
+def test_names_denylist_guarantees_redaction():
+    from redact_md import redact
+    # A deny-list (e.g. a meeting roster) must redact these as PERSON even
+    # for bare first names that NER handles inconsistently.
+    src = "Sydney here. Will can run the demo Thursday."
+    out = redact(src, names=["Sydney", "Will"])
+    assert "Sydney" not in out
+    assert "Will" not in out
+    assert out.count("<PERSON>") == 2
+
+
+@needs_model
+def test_names_denylist_is_case_insensitive_and_multiword():
+    from redact_md import redact
+    src = "thanks chen wei and savannah okafor."
+    out = redact(src, names=["Chen Wei", "Savannah Okafor"])
+    assert "chen wei" not in out
+    assert "savannah okafor" not in out

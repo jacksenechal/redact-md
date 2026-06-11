@@ -123,6 +123,28 @@ redact-md --entities PERSON,EMAIL_ADDRESS notes.md
 `--keep` drops the listed types after detection; `--entities` is an allowlist
 that detects only the listed types. The two are mutually exclusive.
 
+### Always redact known people (a roster)
+
+NER models miss names inconsistently, especially bare first names and names
+that double as places or common words (Paris, Florence, Will, Rose). When you
+already know who is in a document, which for a meeting transcript you usually
+do, pass the roster and those names are **guaranteed** to be redacted as
+`<PERSON>`, regardless of context. Matching is case-insensitive and works for
+full names and bare first names alike.
+
+```bash
+# Inline list
+redact-md --names "Savannah Okafor, Will, Paris Adeyemi" meeting.md
+
+# From a file (one name per line; blank lines and # comments ignored)
+redact-md --names-file team-roster.txt meeting.md
+```
+
+`--names` is additive: it runs alongside normal detection, so everything else
+(emails, phones, other names the model does catch) is still redacted too. This
+is the robust fix for the ambiguous-name gap discussed in the
+[benchmark post](https://jacksenechal.com).
+
 ### Use as an agent hook
 
 Because it reads stdin and writes stdout, `redact-md` drops cleanly into a
