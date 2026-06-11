@@ -1,0 +1,57 @@
+{
+  "redact-cli": {
+    "recall": 0.4032258064516129,
+    "PERSON": 0.0,
+    "PHONE_NUMBER": 0.47368421052631576,
+    "EMAIL_ADDRESS": 1.0,
+    "LOCATION": 0.0,
+    "code_over_redact": 11,
+    "safe_total": 25,
+    "avg_ms": 13.852258073166013,
+    "total_gold": 186
+  },
+  "pii-vault": {
+    "recall": 0.532258064516129,
+    "PERSON": 0.0,
+    "PHONE_NUMBER": 0.7631578947368421,
+    "EMAIL_ADDRESS": 1.0,
+    "LOCATION": 0.0,
+    "code_over_redact": 11,
+    "safe_total": 25,
+    "avg_ms": 2.8417536367972693,
+    "total_gold": 186
+  },
+  "redact-api": {
+    "recall": 0.6505376344086021,
+    "PERSON": 0.84,
+    "PHONE_NUMBER": 0.5,
+    "EMAIL_ADDRESS": 0.9772727272727273,
+    "LOCATION": 0.3076923076923077,
+    "code_over_redact": 11,
+    "safe_total": 25,
+    "avg_ms": 324.01325761651,
+    "total_gold": 186
+  },
+  "presidio": {
+    "recall": 0.8978494623655914,
+    "PERSON": 0.98,
+    "PHONE_NUMBER": 0.9210526315789473,
+    "EMAIL_ADDRESS": 1.0,
+    "LOCATION": 0.38461538461538464,
+    "code_over_redact": 10,
+    "safe_total": 25,
+    "avg_ms": 73.80687561817467,
+    "total_gold": 186
+  },
+  "opf": {
+    "recall": 0.9516129032258065,
+    "PERSON": 0.96,
+    "PHONE_NUMBER": 1.0,
+    "EMAIL_ADDRESS": 0.9545454545454546,
+    "LOCATION": 1.0,
+    "code_over_redact": 10,
+    "safe_total": 25,
+    "avg_ms": 23562.613567399483,
+    "total_gold": 186
+  }
+}

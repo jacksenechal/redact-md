@@ -146,9 +146,10 @@ recognizer (`azure_ai_language.py`) is not loaded by the default
 
 ## Benchmark harness
 
-The `bench/` directory holds the 15-transcript labeled corpus, the evaluation
-scripts, and the captured results behind the numbers above. The Presidio column
-reproduces from this package alone:
+The `bench/` directory holds the labeled corpus (15 representative transcripts
+behind the table above, plus a 16th ambiguous-name stress test), the evaluation
+scripts, and the captured results. The Presidio column reproduces from this
+package alone:
 
 ```bash
 pip install -e ".[dev,model]"
