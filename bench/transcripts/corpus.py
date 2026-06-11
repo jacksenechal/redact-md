@@ -658,6 +658,54 @@ and a copy to our engagement partner at ep.chen@auditfirm.com.
 """
 
 
+# Ambiguous-name stress test: every participant has a first name that is also a
+# place (Geneva, Paris, Florence, Sydney) or a common word / verb / modal
+# (Jack, Rose, Mark, Bill, Will). The doc deliberately mixes person uses with
+# non-person distractors ("revenue rose 12%", "let's mark that", "the cloud
+# bill came to", "the Geneva office", "customer in Austin", "Will follow up").
+# Only the genuine person mentions are annotated as PERSON, so this measures
+# whether each tool keeps catching a name when the surface form is ambiguous.
+TRANSCRIPT_16 = """\
+# Product Planning Sync — Atlas Release
+**Date:** 2026-06-08  **Facilitator:** Geneva Okafor
+
+---
+
+**Geneva Okafor:** Morning all. Geneva here, I'll facilitate. Let's start with
+the roadmap. Jack, can you walk us through the Q3 milestones?
+
+**Jack Lindqvist:** Sure thing. Okay Jack, show me the cards — sorry, thinking
+out loud. The big item is the Atlas migration. We slip two weeks if staging
+isn't ready.
+
+**Geneva Okafor:** Noted. Rose, did finance approve the extra headcount?
+
+**Rose Tanaka:** They did. Revenue rose 12% last quarter so there was room. I'll
+send the signed form to mark@atlas.example.com right after the call.
+
+**Mark Delacroix:** Thanks Rose. And let's mark the hiring item as done. Bill,
+what's the infra spend looking like?
+
+**Bill Nakamura:** The cloud bill came to forty grand in May. Bill Nakamura, for
+the record, thinks we can trim that. Paris flagged some idle instances.
+
+**Paris Adeyemi:** Right, Paris here. We're also standing up the new Geneva
+office next month, so there will be egress costs from the Geneva region.
+
+**Geneva Okafor:** Two Genevas on one call. Florence, you're on mobile?
+
+**Florence Kim:** Yes, Florence Kim, calling in from the Florence co-working
+space, of all places. I'll keep it short.
+
+**Sydney Mbeki:** Sydney here. One thing: we promised the customer in Austin a
+demo. Will can run it. Will, you free Thursday?
+
+**Will Castellano:** I can, yeah. Will follow up with a calendar invite after.
+
+**Geneva Okafor:** Great. Thanks everyone, let's wrap.
+"""
+
+
 def _build_t1():
     doc = TRANSCRIPT_1
     pii = _spans(doc, [
@@ -1000,11 +1048,55 @@ def _build_t15():
     return Transcript("t15_security_audit", doc, pii, safe)
 
 
+def _build_t16():
+    doc = TRANSCRIPT_16
+
+    def ns(anchor: str, name: str, label: str = "PERSON") -> Span:
+        i = doc.find(anchor)
+        if i == -1:
+            raise ValueError(f"anchor not found: {anchor!r}")
+        if doc.find(anchor, i + 1) != -1:
+            raise ValueError(f"anchor not unique: {anchor!r}")
+        j = anchor.find(name)
+        start = i + j
+        return Span(start, start + len(name), label, name)
+
+    pii = [
+        # Full-name mentions (the easy control group)
+        ns("**Geneva Okafor:** Morning", "Geneva Okafor"),
+        ns("**Jack Lindqvist:** Sure", "Jack Lindqvist"),
+        ns("**Rose Tanaka:** They", "Rose Tanaka"),
+        ns("**Mark Delacroix:** Thanks", "Mark Delacroix"),
+        ns("**Bill Nakamura:** The", "Bill Nakamura"),
+        ns("**Paris Adeyemi:** Right", "Paris Adeyemi"),
+        ns("**Florence Kim:** Yes", "Florence Kim"),
+        ns("**Sydney Mbeki:** Sydney", "Sydney Mbeki"),
+        ns("**Will Castellano:** I", "Will Castellano"),
+        # Bare ambiguous first names used as people (the hard cases)
+        ns("Geneva here, I'll", "Geneva"),
+        ns("Jack, can you walk", "Jack"),
+        ns("Okay Jack, show", "Jack"),
+        ns("Rose, did finance", "Rose"),
+        ns("Thanks Rose. And", "Rose"),
+        ns("done. Bill,", "Bill"),
+        ns("Paris flagged", "Paris"),
+        ns("Paris here.", "Paris"),
+        ns("Florence, you're", "Florence"),
+        ns("Sydney here.", "Sydney"),
+        ns("Will can run it", "Will"),
+        ns("Will, you free", "Will"),
+        # Non-person email for realism
+        ns("mark@atlas.example.com right", "mark@atlas.example.com", "EMAIL_ADDRESS"),
+    ]
+    return Transcript("t16_ambiguous_names", doc, pii, [])
+
+
 def load_all() -> List[Transcript]:
     return [
         _build_t1(), _build_t2(), _build_t3(), _build_t4(), _build_t5(),
         _build_t6(), _build_t7(), _build_t8(), _build_t9(), _build_t10(),
         _build_t11(), _build_t12(), _build_t13(), _build_t14(), _build_t15(),
+        _build_t16(),
     ]
 
 

@@ -409,21 +409,32 @@ def bench_redact_api(transcripts=None) -> EvalResult:
 OPF_BIN = os.path.expanduser("~/.local/bin/opf")
 
 def _run_opf(t: Transcript) -> List[Span]:
-    result = subprocess.run(
-        [OPF_BIN, "redact", "--device", "cpu", "--format", "json"],
-        input=t.content,
-        capture_output=True,
-        text=True,
-        timeout=120,
-    )
+    # Pass the transcript as a file (-f), not on stdin: opf splits multiline
+    # stdin into separate examples and emits one JSON object per example, which
+    # breaks json.loads. -f treats the whole file as a single example.
+    # --no-print-color-coded-text suppresses the ANSI legend that opf otherwise
+    # appends to stdout after the JSON (also breaking the parse, with the old
+    # code silently falling back to an empty span list).
+    with tempfile.NamedTemporaryFile("w", suffix=".md", delete=False) as f:
+        f.write(t.content)
+        path = f.name
+    try:
+        result = subprocess.run(
+            [OPF_BIN, "redact", "--device", "cpu", "--format", "json",
+             "--output-mode", "typed", "--no-print-color-coded-text", "-f", path],
+            capture_output=True,
+            text=True,
+            timeout=300,
+        )
+    finally:
+        os.unlink(path)
     if result.returncode != 0:
         raise RuntimeError(f"opf error: {result.stderr[:300]}")
     try:
         data = json.loads(result.stdout)
     except json.JSONDecodeError:
         # Fallback: diff-based span extraction
-        redacted = result.stdout
-        return redacted_text_to_spans(t.content, redacted)
+        return redacted_text_to_spans(t.content, result.stdout)
 
     spans = []
     for sp in data.get("detected_spans", []):
