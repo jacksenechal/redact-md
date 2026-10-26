@@ -161,11 +161,9 @@ text to a cloud model, so PII is stripped before it ever leaves the machine.
 
 Street addresses (38% recall), phone numbers written as words
 ("five five five"), bare passwords with no nearby keyword, and some national
-formats (sort codes, Swiss VAT IDs). Only fenced code is recognized:
-indented (four-space) code blocks are treated as prose, a fence is closed by
-any later fence of three or more of the same character (not necessarily as
-long as the opener), and an unclosed fence is treated as prose, so its contents
-are redacted. For documents where addresses matter, run
+formats (sort codes, Swiss VAT IDs). Only fenced code is skipped: indented
+(four-space) code blocks and unclosed fences are treated as prose, so their
+contents are redacted. For documents where addresses matter, run
 [opf](https://github.com/openai/privacy-filter) as a second pass
 (`opf redact --device cpu`).
 
