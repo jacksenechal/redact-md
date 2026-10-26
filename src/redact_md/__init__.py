@@ -26,11 +26,15 @@ from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import OperatorConfig
 
 
+# Per CommonMark, a fence closes only on a bare line of the same character at
+# least as long as the opener, and an inline code span closes only on a
+# backtick run of exactly the opener's length. Mis-pairing either one makes
+# the prose between two code spans look like code, and it would go unredacted.
 _FENCED_BLOCK = re.compile(
-    r"(?m)^(`{3,}[^\n]*\n.*?^`{3,}|~{3,}[^\n]*\n.*?^~{3,})",
+    r"(?m)^(?:(`{3,})[^\n]*\n.*?^\1`*[ \t\r]*$|(~{3,})[^\n]*\n.*?^\2~*[ \t\r]*$)",
     re.DOTALL,
 )
-_INLINE_CODE = re.compile(r"`[^`\n]+`")
+_INLINE_CODE = re.compile(r"(?<!`)(`+)(?!`)[^\n]*?(?<!`)\1(?!`)")
 
 _PFX = "\x00CODEBLOCK_"
 _SFX = "\x00"

@@ -76,6 +76,43 @@ def test_tilde_fence_restores():
     assert round_trip(TILDE_FENCE) == TILDE_FENCE
 
 
+def test_double_backtick_inline_code():
+    masked, saved = _mask_code(NESTED_BACKTICKS)
+    assert "double backticks" not in masked
+    assert "single" not in masked
+    assert " or " in masked                  # prose between spans stays prose
+    assert round_trip(NESTED_BACKTICKS) == NESTED_BACKTICKS
+
+
+def test_backtick_inside_double_backtick_span():
+    masked, saved = _mask_code("Type ``a ` b`` here.")
+    assert saved == [(saved[0][0], "``a ` b``")]
+
+
+def test_longer_fence_not_closed_by_shorter_one():
+    # A ```` block that shows a ``` line must not close there; if it did, the
+    # closing ```` would open a new block and swallow the prose after it.
+    text = "````\n```\n````\n\nCall Alice at alice@example.com.\n\n```\nls\n```\n"
+    masked, saved = _mask_code(text)
+    assert "alice@example.com" in masked
+    assert len(saved) == 2
+    assert round_trip(text) == text
+
+
+def test_info_string_line_does_not_close_fence():
+    text = "```\nsee ```python below\n```python\nx = 1\n```\nAfter.\n"
+    masked, saved = _mask_code(text)
+    assert "After." in masked
+    assert round_trip(text) == text
+
+
+def test_crlf_fence_preserved():
+    text = "Before.\r\n```\r\nsecret\r\n```\r\nAfter.\r\n"
+    masked, _ = _mask_code(text)
+    assert "secret" not in masked
+    assert round_trip(text) == text
+
+
 def test_no_code_unchanged():
     text = "Hello world, no code blocks here.\n"
     masked, saved = _mask_code(text)
