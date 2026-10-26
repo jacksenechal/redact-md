@@ -23,13 +23,13 @@ needs_model = pytest.mark.skipif(
 def test_redacts_pii_but_preserves_code():
     from redact_md import redact
     src = (
-        "Alice Nguyen emailed a.nguyen@firm.com about SSN 432-18-6792.\n\n"
+        "Alice Nguyen emailed a.nguyen@example.com about SSN 987-65-4321.\n\n"
         "```\nkeep bob@example.com here\n```\n"
     )
     out = redact(src)
     assert "Alice Nguyen" not in out
-    assert "a.nguyen@firm.com" not in out
-    assert "432-18-6792" not in out
+    assert "a.nguyen@example.com" not in out
+    assert "987-65-4321" not in out
     assert "bob@example.com" in out          # code block untouched
     assert "<PERSON>" in out and "<EMAIL>" in out and "<SSN>" in out
 
