@@ -166,6 +166,12 @@ wheel, which never contacts the network at runtime. The optional Azure AI
 recognizer (`azure_ai_language.py`) is not loaded by the default
 `AnalyzerEngine()`. No telemetry.
 
+Output is complete or absent. If a detected span runs into a code span (a URL
+glued to `` `inline code` ``, say), the anonymizer would replace the code along
+with the PII, so `redact-md` exits non-zero with an error instead of writing
+output with the code missing. Unreadable or non-UTF-8 input is a one-line
+error, not a traceback.
+
 ## Benchmark harness
 
 The `bench/` directory holds the labeled corpus (15 representative transcripts

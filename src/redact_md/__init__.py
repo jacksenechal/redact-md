@@ -63,6 +63,11 @@ SUPPORTED_ENTITIES = (
     "MEDICAL_LICENSE", "UK_NHS", "URL",
 )
 
+
+class RedactionError(RuntimeError):
+    """Redaction could not produce complete, safe output for this input."""
+
+
 _analyzer: AnalyzerEngine | None = None
 _anonymizer: AnonymizerEngine | None = None
 
@@ -75,8 +80,9 @@ def _engines() -> tuple[AnalyzerEngine, AnonymizerEngine]:
             _anonymizer = AnonymizerEngine()
         except Exception as exc:
             print(
-                "redact-md: spaCy model 'en_core_web_lg' is not installed.\n"
-                "Install it with:  python -m spacy download en_core_web_lg",
+                "redact-md: could not load the Presidio/spaCy engine.\n"
+                "If the model is missing, install it with:  "
+                "python -m spacy download en_core_web_lg",
                 file=sys.stderr,
             )
             print(f"  ({exc})", file=sys.stderr)
@@ -143,18 +149,45 @@ def redact(text: str, entities=None, keep=None, names=None) -> str:
     if not hits:
         return text
     result = anonymizer.anonymize(text=masked, analyzer_results=hits, operators=_OPERATORS)
+    # Guardrail: a detected span that runs into a code placeholder (e.g. a URL
+    # glued to `inline code`) replaces the placeholder too, and the code would
+    # silently vanish. Refuse rather than return output with content missing.
+    lost = [ph for ph, _ in saved if ph not in result.text]
+    if lost:
+        spans = [(masked.index(ph), masked.index(ph) + len(ph)) for ph in lost]
+        types = sorted({h.entity_type for h in hits
+                        if any(h.start < e and s < h.end for s, e in spans)})
+        raise RedactionError(
+            f"{len(lost)} code span(s) overlap detected {'/'.join(types) or 'PII'} text and "
+            "would be lost from the output. Separate the code from the surrounding "
+            "text, or exclude that type with --keep."
+        )
     return _unmask_code(result.text, saved)
+
+
+def _read_text(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8")
+    except UnicodeDecodeError as exc:
+        raise RedactionError(f"{path}: not valid UTF-8 ({exc.reason} at byte {exc.start})") from exc
 
 
 def _redact_file(src: Path, dst: Path, entities=None, keep=None, names=None) -> None:
     dst.write_text(
-        redact(src.read_text(encoding="utf-8"), entities=entities, keep=keep, names=names),
+        redact(_read_text(src), entities=entities, keep=keep, names=names),
         encoding="utf-8",
     )
     print(f"{src} -> {dst}", file=sys.stderr)
 
 
 def main() -> None:
+    try:
+        _main()
+    except (OSError, RedactionError) as exc:
+        sys.exit(f"redact-md: {exc}")
+
+
+def _main() -> None:
     p = argparse.ArgumentParser(
         prog="redact-md",
         description="Redact PII from markdown files locally (Presidio + spaCy).",
@@ -192,6 +225,10 @@ def main() -> None:
 
     if args.keep and args.entities:
         p.error("--keep and --entities are mutually exclusive")
+    if args.in_place and args.output:
+        p.error("--in-place and --output are mutually exclusive")
+    if args.in_place and args.input == "-":
+        p.error("--in-place needs a FILE, not stdin")
 
     def _parse_entities(raw: str) -> list[str]:
         result = []
@@ -215,7 +252,7 @@ def main() -> None:
         names += [n.strip() for n in args.names.split(",") if n.strip()]
     if args.names_file:
         names += [ln.strip() for ln in
-                  Path(args.names_file).read_text(encoding="utf-8").splitlines()
+                  _read_text(Path(args.names_file)).splitlines()
                   if ln.strip() and not ln.lstrip().startswith("#")]
     names = names or None
 
@@ -223,6 +260,8 @@ def main() -> None:
         if not args.out_dir:
             p.error("--out-dir is required with --dir")
         in_root = Path(args.dir)
+        if not in_root.is_dir():
+            p.error(f"--dir {in_root}: not a directory")
         out_root = Path(args.out_dir)
         out_root.mkdir(parents=True, exist_ok=True)
         for src in sorted(in_root.rglob("*.md")):
@@ -237,15 +276,13 @@ def main() -> None:
     if args.input == "-":
         text = sys.stdin.read()
     else:
-        text = Path(args.input).read_text(encoding="utf-8")
+        text = _read_text(Path(args.input))
 
     redacted = redact(text, entities=entities, keep=keep, names=names)
 
-    if args.in_place and args.input != "-":
+    if args.in_place:
         src = Path(args.input)
-        src.with_suffix(src.suffix + ".bak").write_text(
-            src.read_text(encoding="utf-8"), encoding="utf-8"
-        )
+        src.with_suffix(src.suffix + ".bak").write_text(text, encoding="utf-8")
         src.write_text(redacted, encoding="utf-8")
         print(f"Redacted in place: {src} (backup: {src}.bak)", file=sys.stderr)
     elif args.output:
