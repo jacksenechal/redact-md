@@ -84,3 +84,13 @@ def test_names_denylist_is_case_insensitive_and_multiword():
     out = redact(src, names=["Chen Wei", "Savannah Okafor"])
     assert "chen wei" not in out
     assert "savannah okafor" not in out
+
+
+@needs_model
+def test_code_swallowed_by_detection_fails_loudly():
+    # Real-model regression for the placeholder guardrail: Presidio's URL
+    # match runs straight into inline code glued to it. Before the guardrail
+    # the code block silently disappeared from the output.
+    from redact_md import RedactionError, redact
+    with pytest.raises(RedactionError):
+        redact("See https://example.com/`snippet` for details.")
