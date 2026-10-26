@@ -9,7 +9,6 @@ import time
 import json
 import difflib
 from pathlib import Path
-from dataclasses import dataclass
 from typing import List
 
 # Add corpus path
