@@ -4,13 +4,17 @@ build-backend = "hatchling.build"
 
 [project]
 name = "redact-md"
-version = "0.1.1"
+version = "0.1.2"
 description = "Markdown-aware local PII redaction (Presidio + spaCy)"
 requires-python = ">=3.10"
 dependencies = [
     "presidio-analyzer>=2.2",
     "presidio-anonymizer>=2.2",
     "spacy>=3.7,<4.0",
+    # spaCy and typer import `click` at runtime, but typer 0.26.x dropped it
+    # from its declared dependencies, so it isn't pulled in transitively.
+    # Pin it explicitly until that upstream packaging gap is fixed.
+    "click>=8.1,<9",
 ]
 
 [project.scripts]
