@@ -1,5 +1,7 @@
 # redact-md
 
+[![tests](https://github.com/jacksenechal/redact-md/actions/workflows/test.yml/badge.svg)](https://github.com/jacksenechal/redact-md/actions/workflows/test.yml)
+
 Markdown in, redacted markdown out, code blocks left alone. All local.
 
 `redact-md` strips PII (names, emails, phones, SSNs, IBANs, and more) from
@@ -191,6 +193,7 @@ python -m venv venv && source venv/bin/activate
 pip install -e ".[dev,model]"
 pytest                      # unit + integration (model present)
 pytest -m "not integration" # fast, no model required
+ruff check .                # lint
 ```
 
 ## License

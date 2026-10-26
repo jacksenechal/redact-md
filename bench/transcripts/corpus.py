@@ -4,7 +4,7 @@ Gold annotations: list of {start, end, label, text} dicts (char offsets).
 Must-not-touch spans: code blocks, inline code, URLs inside code.
 """
 from __future__ import annotations
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Tuple
 
 

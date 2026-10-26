@@ -18,7 +18,7 @@ import json
 import subprocess
 import tempfile
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional
 from pathlib import Path
 from collections import defaultdict
 
@@ -180,7 +180,7 @@ def print_result(r: EvalResult):
     print(f"  Avg ms/transcript (warm):        {r.avg_ms:.0f} ms")
     print(f"  Model load time:                 {r.load_time_ms:.0f} ms")
 
-    print(f"\n  Per-entity recall:")
+    print("\n  Per-entity recall:")
     for lbl, d in sorted(r.per_label.items()):
         tp = d["tp"]
         tot = d["total"]
@@ -194,7 +194,7 @@ def print_result(r: EvalResult):
             print(f"    MISS: {m}")
 
     if r.safe_hits:
-        print(f"\n  SAFE SPANS HIT (over-redaction):")
+        print("\n  SAFE SPANS HIT (over-redaction):")
         for s in r.safe_hits:
             print(f"    HIT: {s}")
 

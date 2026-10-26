@@ -2,7 +2,6 @@
 Unit tests for code-block masking logic.
 No spaCy model required -- the Presidio engine is not instantiated.
 """
-import pytest
 from redact_md import _mask_code, _unmask_code
 
 
