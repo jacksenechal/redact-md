@@ -11,7 +11,7 @@ inline `` `code` `` are preserved unchanged, so it is safe to run on notes,
 transcripts, and AI artifacts that mix prose with config and snippets.
 
 ````markdown
-**Alice Nguyen:** My SSN is 432-18-6792. Reach me at a.nguyen@firm.com.
+**Alice Nguyen:** My SSN is 987-65-4321. Reach me at a.nguyen@example.com.
 
 ```yaml
 api_key: "sk-abc123"   # code blocks are skipped
@@ -45,7 +45,7 @@ clean file out, code blocks intact.
 ## Benchmarks
 
 Full methodology and numbers are in the
-[accompanying blog post](https://jacksenechal.com). Short version:
+[accompanying blog post](https://jacksenechal.com/2026/06/10/benchmarking-local-pii-redaction.html). Short version:
 
 | Tool | Recall | PERSON | ms/doc | Egress |
 |------|--------|--------|--------|--------|
@@ -54,6 +54,12 @@ Full methodology and numbers are in the
 | redact-cli (Docker+NER) | 65% | 84% | 339 ms | No |
 | **Presidio (this tool)** | **90%** | **98%** | **64 ms** | **No** |
 | opf (accuracy ceiling) | 95% | 96% | 20,000 ms | No |
+
+Recall is measured on 186 labeled spans across 15 transcripts. The Presidio
+row is Presidio's analyzer run directly on each transcript; `redact-md` adds
+code masking on top, so it leaves code blocks alone where raw Presidio does not.
+Timings are from the run in the post and vary by machine; the saved re-run in
+`bench/results/rerun_15doc.json` reproduces every recall figure exactly.
 
 Regex-only tools miss every person name. Presidio catches 98% of names, is
 local, and is fast. The remaining gap versus the opf model ceiling is mostly
@@ -145,7 +151,7 @@ redact-md --names-file team-roster.txt meeting.md
 `--names` is additive: it runs alongside normal detection, so everything else
 (emails, phones, other names the model does catch) is still redacted too. This
 is the robust fix for the ambiguous-name gap discussed in the
-[benchmark post](https://jacksenechal.com).
+[benchmark post](https://jacksenechal.com/2026/06/10/benchmarking-local-pii-redaction.html).
 
 ### Use as an agent hook
 
@@ -157,7 +163,9 @@ text to a cloud model, so PII is stripped before it ever leaves the machine.
 
 Street addresses (38% recall), phone numbers written as words
 ("five five five"), bare passwords with no nearby keyword, and some national
-formats (sort codes, Swiss VAT IDs). For documents where addresses matter, run
+formats (sort codes, Swiss VAT IDs). Only fenced code is skipped: indented
+(four-space) code blocks and unclosed fences are treated as prose, so their
+contents are redacted. For documents where addresses matter, run
 [opf](https://github.com/openai/privacy-filter) as a second pass
 (`opf redact --device cpu`).
 

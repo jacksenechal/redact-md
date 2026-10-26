@@ -1,7 +1,8 @@
 """
 Run opf via its Python API (single model load, then batch).
-Must be run with the opf pipx Python:
-  /home/jack/.local/pipx/venvs/opf/bin/python3 run_opf_api.py
+Must be run with the Python from the environment where opf is installed,
+e.g. for a pipx install:
+  ~/.local/pipx/venvs/opf/bin/python3 bench/scripts/run_opf_api.py
 """
 from __future__ import annotations
 import sys
