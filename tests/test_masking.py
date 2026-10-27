@@ -2,6 +2,8 @@
 Unit tests for code-block masking logic.
 No spaCy model required -- the Presidio engine is not instantiated.
 """
+import pytest
+
 from redact_md import _mask_code, _unmask_code
 
 
@@ -141,10 +143,11 @@ def test_placeholder_uniqueness():
     assert len(placeholders) == len(set(placeholders))
 
 
-def test_empty_allowlist_redacts_nothing():
-    # An explicit empty allowlist short-circuits before the engine loads, so
-    # this runs without the spaCy model. Guards against Presidio's quirk of
-    # treating entities=[] as "detect everything".
+def test_empty_allowlist_is_rejected():
+    # Fails before the engine loads, so no spaCy model is needed. An empty
+    # allowlist must not silently return the text unredacted.
     from redact_md import redact
-    text = "Bob Jones at bob@example.com."
-    assert redact(text, entities=[]) == text
+    with pytest.raises(ValueError, match="entities is empty"):
+        redact("Bob Jones at bob@example.com.", entities=[])
+    with pytest.raises(ValueError, match="entities is empty"):
+        redact("Bob Jones", entities=[], names=["Bob"])

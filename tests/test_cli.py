@@ -80,3 +80,15 @@ def test_missing_dir_is_rejected(monkeypatch, tmp_path, capsys):
 @pytest.mark.parametrize("argv", [["-i", "-o", "out.md", "in.md"], ["-i", "-"]])
 def test_in_place_conflicts_are_rejected(monkeypatch, argv):
     assert _run_cli(monkeypatch, *argv) == 2
+
+
+@pytest.mark.parametrize("raw", [",", "", " , "])
+def test_empty_entities_is_one_line_error_and_writes_nothing(monkeypatch, tmp_path, raw):
+    src = tmp_path / "a.md"
+    src.write_text("Bob at bob@example.com\n", encoding="utf-8")
+    out = tmp_path / "out.md"
+    with pytest.raises(SystemExit) as exc:
+        monkeypatch.setattr(sys, "argv", ["redact-md", "--entities", raw, "-o", str(out), str(src)])
+        main()
+    assert exc.value.code == "redact-md: --entities: no entity types given"
+    assert not out.exists()

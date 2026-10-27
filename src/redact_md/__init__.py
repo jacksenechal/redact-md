@@ -118,6 +118,7 @@ def redact(text: str, entities=None, keep=None, names=None) -> str:
 
     entities: allowlist of entity types to detect. ``None`` (the default)
               means detect everything Presidio supports -- maximum recall.
+              An empty list raises ``ValueError``.
     keep:     iterable of entity types to leave untouched, applied after
               detection. Mutually exclusive with ``entities`` at the CLI.
     names:    iterable of known person names to always redact (as PERSON),
@@ -125,10 +126,10 @@ def redact(text: str, entities=None, keep=None, names=None) -> str:
               guarantees those names are caught even when NER misses them
               (bare first names, names that are also places or common words).
     """
-    if entities is not None and not entities and not names:
-        # An explicit empty allowlist means "redact nothing". (Presidio treats
-        # an empty entities list as "detect everything", so short-circuit.)
-        return text
+    if entities is not None and not entities:
+        # An empty allowlist would silently redact nothing (and Presidio treats
+        # it as "detect everything"), so refuse rather than fail open.
+        raise ValueError("entities is empty; pass None to detect all types")
     masked, saved = _mask_code(text)
     analyzer, anonymizer = _engines()
 
@@ -247,7 +248,11 @@ def _main() -> None:
 
     # entities = allowlist (detect only these); keep = drop these after
     # detection. Default (neither) redacts every type Presidio detects.
-    entities: list[str] | None = _parse_entities(args.entities) if args.entities else None
+    entities: list[str] | None = None
+    if args.entities is not None:
+        entities = _parse_entities(args.entities)
+        if not entities:
+            raise RedactionError("--entities: no entity types given")
     keep: set[str] | None = set(_parse_entities(args.keep)) if args.keep else None
 
     # names = a deny-list of known people to always redact as PERSON.
